@@ -1,0 +1,12 @@
+{
+  "name": "payroll-app",
+  "version": "1.0.0",
+  "description": "Payroll System for CV. Kreasi Indah Jaya",
+  "scripts": {
+    "build": "cd frontend && npm install && npm run build && cd ../backend && npm install",
+    "start": "cd backend && node server.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
