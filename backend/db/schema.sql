@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS employees (
     lembur_per_jam INTEGER DEFAULT 0,
     transport_per_hari INTEGER DEFAULT 0,
     makan_per_hari INTEGER DEFAULT 0,
+     kerajinan_default INTEGER DEFAULT 0,
     is_active INTEGER DEFAULT 1,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
