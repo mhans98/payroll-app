@@ -31,7 +31,9 @@ async function initDatabase() {
     const schemaPath = path.join(__dirname, 'db', 'schema.sql');
     const schema = fs.readFileSync(schemaPath, 'utf8');
     await pool.query(schema);
-    console.log('✅ Database tables created/verified');
+     try {
+      await pool.query(`ALTER TABLE employees ADD COLUMN IF NOT EXISTS kerajinan_default INTEGER DEFAULT 0`);
+    } catch (e) { /* column might already exist */ }
   } catch (error) {
     console.error('Database initialization error:', error.message);
     // Tables might already exist, continue anyway
