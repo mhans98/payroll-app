@@ -83,11 +83,12 @@ if (typeof document !== 'undefined') {
       .print-area, .print-area * { visibility: visible; }
       .print-area { position: absolute; left: 0; top: 0; width: 100%; }
       .no-print { display: none !important; }
-      @page { margin: 10mm; }
+      @page { margin: 5mm; size: A4; }
     }
   `;
   document.head.appendChild(printStyles);
 }
+
 
 const styles = {
   container: { minHeight: '100vh', background: '#f1f5f9' },
@@ -1286,10 +1287,10 @@ export default function App() {
             ) : (
               /* BATCH SLIPS - 4 per page (2x2) */
               <div>
-                <p style={{ marginBottom: '16px', color: '#6b7280', fontSize: '0.875rem' }}>💡 Format 4 slip per halaman (2x2) - potong sesuai garis putus-putus</p>
+                <p className="no-print" style={{ marginBottom: '16px', color: '#6b7280', fontSize: '0.875rem' }}>💡 Format 4 slip per halaman (2x2) - potong sesuai garis putus-putus</p>
                 {Array.from({ length: Math.ceil(payrollEntries.length / 4) }, (_, pageIdx) => (
-                  <div key={pageIdx} style={{ background: 'white', marginBottom: '24px', padding: '16px', borderRadius: '8px' }}>
-                    <p style={{ color: '#9ca3af', fontSize: '0.75rem', marginBottom: '8px' }}>Halaman {pageIdx + 1}</p>
+                  <div key={pageIdx} style={{ background: 'white', marginBottom: '24px', padding: '16px', borderRadius: '8px', pageBreakAfter: 'always' }}>
+                    <p className="no-print" style={{ color: '#9ca3af', fontSize: '0.75rem', marginBottom: '8px' }}>Halaman {pageIdx + 1}</p>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                       {payrollEntries.slice(pageIdx * 4, (pageIdx + 1) * 4).map(entry => {
                         const calc = calculatePayroll(entry);
