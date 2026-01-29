@@ -665,8 +665,7 @@ export default function App() {
                     style={{ fontSize: '0.75rem', padding: '4px 8px', background: '#f0fdf4', border: '1px solid #86efac', borderRadius: '4px', cursor: 'pointer', color: '#166534', marginTop: '4px' }}
                   >+ Tambah</button>
                 </div>
-                                
-                </div>
+                      
 
                 <div>
                   <label style={styles.label}>Pot. Pinjaman</label>
