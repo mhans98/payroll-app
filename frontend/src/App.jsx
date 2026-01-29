@@ -74,6 +74,21 @@ function generateWeekOptions(n = 5) {
 // =====================================================
 // STYLES
 // =====================================================
+// Add print styles to document
+if (typeof document !== 'undefined') {
+  const printStyles = document.createElement('style');
+  printStyles.innerHTML = `
+    @media print {
+      body * { visibility: hidden; }
+      .print-area, .print-area * { visibility: visible; }
+      .print-area { position: absolute; left: 0; top: 0; width: 100%; }
+      .no-print { display: none !important; }
+      @page { margin: 10mm; }
+    }
+  `;
+  document.head.appendChild(printStyles);
+}
+
 const styles = {
   container: { minHeight: '100vh', background: '#f1f5f9' },
   sidebar: {
@@ -1196,7 +1211,7 @@ export default function App() {
       <div style={styles.modal} onClick={() => setShowPrintModal(false)}>
         <div style={{ background: '#f1f5f9', borderRadius: '16px', maxWidth: printMode === 'daftarbayar' ? '900px' : '700px', width: '100%', maxHeight: '95vh', overflow: 'auto' }} onClick={e => e.stopPropagation()}>
           {/* Header */}
-          <div style={{ padding: '16px 24px', background: 'white', borderBottom: '1px solid #e5e7eb', display: 'flex', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 10 }}>
+         <div className="no-print" style={{ padding: '16px 24px', background: 'white', borderBottom: '1px solid #e5e7eb', display: 'flex', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 10 }}>
             <h3 style={{ fontWeight: '600' }}>
               {printMode === 'daftarbayar' ? '📋 Daftar Bayar' : '🖨️ Cetak Semua Slip (3 per halaman)'}
             </h3>
@@ -1207,7 +1222,7 @@ export default function App() {
           </div>
 
           {/* Content */}
-          <div style={{ padding: '24px' }}>
+          <div className="print-area" style={{ padding: '24px' }}>
             {printMode === 'daftarbayar' ? (
               /* DAFTAR BAYAR */
               <div style={{ background: 'white', padding: '24px', borderRadius: '8px' }}>
