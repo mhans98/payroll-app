@@ -74,24 +74,7 @@ function generateWeekOptions(n = 5) {
 // =====================================================
 // STYLES
 // =====================================================
-// Add print styles to document
-if (typeof document !== 'undefined' && !document.getElementById('payroll-print-styles')) {
-  const printStyles = document.createElement('style');
-  printStyles.id = 'payroll-print-styles';
-  printStyles.innerHTML = `
-    @media print {
-      body > * { display: none !important; }
-      body > .print-modal { display: block !important; }
-      .print-modal { position: static !important; background: white !important; }
-      .print-modal > div { box-shadow: none !important; max-height: none !important; overflow: visible !important; }
-      .no-print { display: none !important; }
-      .print-page { page-break-after: always; break-after: page; }
-      .print-page:last-child { page-break-after: avoid; break-after: avoid; }
-      @page { margin: 5mm; size: A4; }
-    }
-  `;
-  document.head.appendChild(printStyles);
-}
+// Print styles are handled inline
 
 
 const styles = {
@@ -1196,7 +1179,40 @@ export default function App() {
 
           <div style={{ display: 'flex', gap: '12px', marginTop: '24px', justifyContent: 'flex-end' }}>
             <button onClick={() => setShowSlipModal(false)} style={{ ...styles.button, ...styles.buttonOutline }}>Tutup</button>
-            <button onClick={() => window.print()} style={{ ...styles.button, ...styles.buttonPrimary }}>🖨️ Cetak</button>
+            <button onClick={() => {
+                const printContent = document.getElementById('print-content');
+                const printWindow = window.open('', '_blank');
+                printWindow.document.write(`
+                  <html>
+                    <head>
+                      <title>Slip Gaji - CV. Kreasi Indah Jaya</title>
+                      <style>
+                        body { font-family: Arial, sans-serif; margin: 0; padding: 10px; }
+                        .print-page { page-break-after: always; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 10px; padding: 10px; height: calc(100vh - 20px); box-sizing: border-box; }
+                        .print-page:last-child { page-break-after: avoid; }
+                        .slip { border: 1px dashed #ccc; padding: 10px; font-size: 11px; display: flex; flex-direction: column; }
+                        .slip-header { text-align: center; border-bottom: 2px solid #1a1a2e; padding-bottom: 5px; margin-bottom: 5px; }
+                        .slip-header h4 { margin: 0; font-size: 12px; }
+                        .slip-header p { margin: 2px 0; font-size: 10px; color: #666; }
+                        .slip-info { font-size: 10px; margin-bottom: 5px; }
+                        .slip-attendance { background: #f8f8f8; padding: 5px; border-radius: 4px; margin-bottom: 5px; font-size: 10px; display: flex; justify-content: space-between; }
+                        table { width: 100%; font-size: 10px; border-collapse: collapse; }
+                        td { padding: 3px 0; border-bottom: 1px solid #eee; }
+                        .total-row { background: #f0fff4; font-weight: bold; }
+                        .deduct-row { background: #fff5f5; color: #c00; }
+                        .net-pay { background: #059669; color: white; padding: 6px; border-radius: 4px; display: flex; justify-content: space-between; margin-top: 5px; }
+                        .signatures { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 8px; font-size: 9px; text-align: center; }
+                        .signatures > div > p { margin-bottom: 25px; color: #666; }
+                        .signatures > div > div { border-top: 1px solid #ccc; padding-top: 3px; }
+                        @page { margin: 5mm; }
+                      </style>
+                    </head>
+                    <body>${printContent.innerHTML}</body>
+                  </html>
+                `);
+                printWindow.document.close();
+                printWindow.print();
+              }} style={{ ...styles.button, ...styles.buttonPrimary }}>🖨️ Cetak</button>
           </div>
         </div>
       </div>
@@ -1213,7 +1229,7 @@ export default function App() {
     }, 0);
 
     return (
-      <div className="print-modal" style={styles.modal} onClick={() => setShowPrintModal(false)}>
+      <div style={styles.modal} onClick={() => setShowPrintModal(false)}>
         <div style={{ background: '#f1f5f9', borderRadius: '16px', maxWidth: printMode === 'daftarbayar' ? '900px' : '700px', width: '100%', maxHeight: '95vh', overflow: 'auto' }} onClick={e => e.stopPropagation()}>
           {/* Header */}
          <div className="no-print" style={{ padding: '16px 24px', background: 'white', borderBottom: '1px solid #e5e7eb', display: 'flex', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 10 }}>
@@ -1227,7 +1243,7 @@ export default function App() {
           </div>
 
           {/* Content */}
-          <div className="print-area" style={{ padding: '24px' }}>
+          <div id="print-content" style={{ padding: '24px' }}>
             {printMode === 'daftarbayar' ? (
               /* DAFTAR BAYAR */
               <div style={{ background: 'white', padding: '24px', borderRadius: '8px' }}>
@@ -1292,10 +1308,10 @@ export default function App() {
               /* BATCH SLIPS - 4 per page (2x2) */
               <div>
                 <p className="no-print" style={{ marginBottom: '16px', color: '#6b7280', fontSize: '0.875rem' }}>💡 Format 4 slip per halaman (2x2) - potong sesuai garis putus-putus</p>
-                {Array.from({ length: Math.ceil(payrollEntries.length / 4) }, (_, pageIdx) => (
+               {Array.from({ length: Math.ceil(payrollEntries.length / 4) }, (_, pageIdx) => (
                   <div key={pageIdx} className="print-page" style={{ background: 'white', marginBottom: '24px', padding: '16px', borderRadius: '8px' }}>
-                    <p className="no-print" style={{ color: '#9ca3af', fontSize: '0.75rem', marginBottom: '8px' }}>Halaman {pageIdx + 1}</p>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gridTemplateRows: '1fr 1fr', gap: '12px', height: '100%' }}>
+                    <p style={{ color: '#9ca3af', fontSize: '0.75rem', marginBottom: '8px' }}>Halaman {pageIdx + 1}</p>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                       {payrollEntries.slice(pageIdx * 4, (pageIdx + 1) * 4).map(entry => {
                         const calc = calculatePayroll(entry);
                         const lemburArray = JSON.parse(entry.lembur_per_hari || '[0,0,0,0,0,0,0]');
