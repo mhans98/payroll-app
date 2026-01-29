@@ -1097,6 +1097,13 @@ export default function App() {
                 <td style={{ textAlign: 'right', color: '#6b7280' }}>—</td>
                 <td style={{ textAlign: 'right', fontWeight: '500' }}>{formatRp(calc?.kerajinan)}</td>
               </tr>
+              {calc?.tambahanList?.map((item, idx) => (
+                <tr key={idx} style={{ borderBottom: '1px solid #e5e7eb' }}>
+                  <td style={{ padding: '8px 0' }}>{item.nama || 'Tambahan'}</td>
+                  <td style={{ textAlign: 'right', color: '#6b7280' }}>—</td>
+                  <td style={{ textAlign: 'right', fontWeight: '500' }}>{formatRp(item.nominal)}</td>
+                </tr>
+              ))}
               <tr style={{ background: '#f0fdf4' }}>
                 <td colSpan="2" style={{ padding: '10px 0', fontWeight: '600' }}>Total Pendapatan</td>
                 <td style={{ textAlign: 'right', fontWeight: '700' }}>{formatRp(calc?.totalPendapatan)}</td>
