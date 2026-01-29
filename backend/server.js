@@ -549,6 +549,20 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
+// Reset all data (use carefully!)
+app.delete('/api/reset-all-data', async (req, res) => {
+  try {
+    await pool.query('DELETE FROM loan_payments');
+    await pool.query('DELETE FROM loans');
+    await pool.query('DELETE FROM payroll_entries');
+    await pool.query('DELETE FROM payroll_weeks');
+    await pool.query('DELETE FROM employees');
+    await pool.query('DELETE FROM audit_log');
+    res.json({ message: 'All data deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 // =====================================================
 // SERVE FRONTEND (Production)
 // =====================================================
