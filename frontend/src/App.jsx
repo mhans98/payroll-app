@@ -455,7 +455,8 @@ export default function App() {
               <th style={{ ...styles.th, textAlign: 'right' }}>Gaji/Hari</th>
               <th style={{ ...styles.th, textAlign: 'right' }}>Lembur/Jam</th>
               <th style={{ ...styles.th, textAlign: 'right' }}>Transport/Hari</th>
-              <th style={{ ...styles.th, textAlign: 'right' }}>Makan/Hari</th>
+               <th style={{ ...styles.th, textAlign: 'right' }}>Makan/Hari</th>
+              <th style={{ ...styles.th, textAlign: 'right' }}>Kerajinan</th>
               <th style={{ ...styles.th, textAlign: 'center' }}>Pinjaman</th>
               <th style={{ ...styles.th, textAlign: 'center' }}>Aksi</th>
             </tr>
@@ -471,6 +472,7 @@ export default function App() {
                   <td style={{ ...styles.td, textAlign: 'right' }}>{formatRp(emp.lembur_per_jam)}</td>
                   <td style={{ ...styles.td, textAlign: 'right' }}>{formatRp(emp.transport_per_hari)}</td>
                   <td style={{ ...styles.td, textAlign: 'right' }}>{formatRp(emp.makan_per_hari)}</td>
+                  <td style={{ ...styles.td, textAlign: 'right' }}>{formatRp(emp.kerajinan_default)}</td>
                   <td style={{ ...styles.td, textAlign: 'center' }}>
                     {totalLoan > 0 ? (
                       <span style={{ ...styles.badge, background: '#fef3c7', color: '#92400e' }}>{formatRp(totalLoan)}</span>
