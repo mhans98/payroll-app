@@ -75,14 +75,18 @@ function generateWeekOptions(n = 5) {
 // STYLES
 // =====================================================
 // Add print styles to document
-if (typeof document !== 'undefined') {
+if (typeof document !== 'undefined' && !document.getElementById('payroll-print-styles')) {
   const printStyles = document.createElement('style');
+  printStyles.id = 'payroll-print-styles';
   printStyles.innerHTML = `
     @media print {
-      body * { visibility: hidden; }
-      .print-area, .print-area * { visibility: visible; }
-      .print-area { position: absolute; left: 0; top: 0; width: 100%; }
+      body > * { display: none !important; }
+      body > .print-modal { display: block !important; }
+      .print-modal { position: static !important; background: white !important; }
+      .print-modal > div { box-shadow: none !important; max-height: none !important; overflow: visible !important; }
       .no-print { display: none !important; }
+      .print-page { page-break-after: always; break-after: page; }
+      .print-page:last-child { page-break-after: avoid; break-after: avoid; }
       @page { margin: 5mm; size: A4; }
     }
   `;
@@ -1209,7 +1213,7 @@ export default function App() {
     }, 0);
 
     return (
-      <div style={styles.modal} onClick={() => setShowPrintModal(false)}>
+      <div className="print-modal" style={styles.modal} onClick={() => setShowPrintModal(false)}>
         <div style={{ background: '#f1f5f9', borderRadius: '16px', maxWidth: printMode === 'daftarbayar' ? '900px' : '700px', width: '100%', maxHeight: '95vh', overflow: 'auto' }} onClick={e => e.stopPropagation()}>
           {/* Header */}
          <div className="no-print" style={{ padding: '16px 24px', background: 'white', borderBottom: '1px solid #e5e7eb', display: 'flex', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 10 }}>
@@ -1289,9 +1293,9 @@ export default function App() {
               <div>
                 <p className="no-print" style={{ marginBottom: '16px', color: '#6b7280', fontSize: '0.875rem' }}>💡 Format 4 slip per halaman (2x2) - potong sesuai garis putus-putus</p>
                 {Array.from({ length: Math.ceil(payrollEntries.length / 4) }, (_, pageIdx) => (
-                  <div key={pageIdx} style={{ background: 'white', marginBottom: '24px', padding: '16px', borderRadius: '8px', pageBreakAfter: 'always' }}>
+                  <div key={pageIdx} className="print-page" style={{ background: 'white', marginBottom: '24px', padding: '16px', borderRadius: '8px' }}>
                     <p className="no-print" style={{ color: '#9ca3af', fontSize: '0.75rem', marginBottom: '8px' }}>Halaman {pageIdx + 1}</p>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gridTemplateRows: '1fr 1fr', gap: '12px', height: '100%' }}>
                       {payrollEntries.slice(pageIdx * 4, (pageIdx + 1) * 4).map(entry => {
                         const calc = calculatePayroll(entry);
                         const lemburArray = JSON.parse(entry.lembur_per_hari || '[0,0,0,0,0,0,0]');
