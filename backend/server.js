@@ -324,15 +324,18 @@ app.post('/api/payroll/initialize/:weekId', async (req, res) => {
     const employees = await pool.query('SELECT id FROM employees WHERE is_active = 1');
     const weekId = req.params.weekId;
     
-    for (const emp of employees.rows) {
+        for (const emp of employees.rows) {
       const existing = await pool.query(
         'SELECT id FROM payroll_entries WHERE employee_id = $1 AND week_id = $2',
         [emp.id, weekId]
       );
       if (existing.rows.length === 0) {
+        const empData = await pool.query('SELECT kerajinan_default FROM employees WHERE id = $1', [emp.id]);
+        const kerajinanDefault = empData.rows[0]?.kerajinan_default || 0;
+        
         await pool.query(
-          'INSERT INTO payroll_entries (employee_id, week_id) VALUES ($1, $2)',
-          [emp.id, weekId]
+          'INSERT INTO payroll_entries (employee_id, week_id, kerajinan) VALUES ($1, $2, $3)',
+          [emp.id, weekId, kerajinanDefault]
         );
       }
     }
