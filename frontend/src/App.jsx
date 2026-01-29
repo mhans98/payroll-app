@@ -665,50 +665,7 @@ export default function App() {
                     style={{ fontSize: '0.75rem', padding: '4px 8px', background: '#f0fdf4', border: '1px solid #86efac', borderRadius: '4px', cursor: 'pointer', color: '#166534', marginTop: '4px' }}
                   >+ Tambah</button>
                 </div>
-                                <div>
-                  <label style={styles.label}>Tambahan Lainnya</label>
-                  {JSON.parse(entry.tambahan_lainnya || '[]').map((item, idx) => (
-                    <div key={idx} style={{ display: 'flex', gap: '4px', marginBottom: '4px' }}>
-                      <input
-                        type="text"
-                        value={item.nama}
-                        placeholder="Nama"
-                        style={{ ...styles.input, flex: 1, padding: '6px 8px', fontSize: '0.8rem' }}
-                        onChange={(e) => {
-                          const arr = JSON.parse(entry.tambahan_lainnya || '[]');
-                          arr[idx].nama = e.target.value;
-                          updatePayrollEntry(entry.id, { tambahan_lainnya: arr });
-                        }}
-                      />
-                      <input
-                        type="number"
-                        value={item.nominal}
-                        placeholder="Nominal"
-                        style={{ ...styles.input, width: '80px', padding: '6px 8px', fontSize: '0.8rem' }}
-                        onChange={(e) => {
-                          const arr = JSON.parse(entry.tambahan_lainnya || '[]');
-                          arr[idx].nominal = parseInt(e.target.value) || 0;
-                          updatePayrollEntry(entry.id, { tambahan_lainnya: arr });
-                        }}
-                      />
-                      <button
-                        onClick={() => {
-                          const arr = JSON.parse(entry.tambahan_lainnya || '[]');
-                          arr.splice(idx, 1);
-                          updatePayrollEntry(entry.id, { tambahan_lainnya: arr });
-                        }}
-                        style={{ background: '#fee2e2', border: 'none', borderRadius: '4px', padding: '0 8px', cursor: 'pointer', color: '#dc2626' }}
-                      >✕</button>
-                    </div>
-                  ))}
-                  <button
-                    onClick={() => {
-                      const arr = JSON.parse(entry.tambahan_lainnya || '[]');
-                      arr.push({ nama: '', nominal: 0 });
-                      updatePayrollEntry(entry.id, { tambahan_lainnya: arr });
-                    }}
-                    style={{ fontSize: '0.75rem', padding: '4px 8px', background: '#f0fdf4', border: '1px solid #86efac', borderRadius: '4px', cursor: 'pointer', color: '#166534', marginTop: '4px' }}
-                  >+ Tambah</button>
+                                
                 </div>
 
                 <div>
