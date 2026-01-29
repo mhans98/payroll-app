@@ -1307,11 +1307,8 @@ export default function App() {
             ) : (
               /* BATCH SLIPS - 4 per page (2x2) */
               <div>
-                <p className="no-print" style={{ marginBottom: '16px', color: '#6b7280', fontSize: '0.875rem' }}>💡 Format 4 slip per halaman (2x2) - potong sesuai garis putus-putus</p>
-               {Array.from({ length: Math.ceil(payrollEntries.length / 4) }, (_, pageIdx) => (
-                  <div key={pageIdx} className="print-page" style={{ background: 'white', marginBottom: '24px', padding: '16px', borderRadius: '8px' }}>
-                    <p style={{ color: '#9ca3af', fontSize: '0.75rem', marginBottom: '8px' }}>Halaman {pageIdx + 1}</p>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                {Array.from({ length: Math.ceil(payrollEntries.length / 4) }, (_, pageIdx) => (
+                  <div key={pageIdx} className="print-page" style={{ background: 'white', marginBottom: '16px', padding: '8px', borderRadius: '8px', display: 'grid', gridTemplateColumns: '1fr 1fr', gridTemplateRows: '1fr 1fr', gap: '8px', minHeight: '270mm' }}>
                       {payrollEntries.slice(pageIdx * 4, (pageIdx + 1) * 4).map(entry => {
                         const calc = calculatePayroll(entry);
                         const lemburArray = JSON.parse(entry.lembur_per_hari || '[0,0,0,0,0,0,0]');
@@ -1388,7 +1385,6 @@ export default function App() {
                           </div>
                         );
                       })}
-                    </div>
                   </div>
                 ))}
               </div>
