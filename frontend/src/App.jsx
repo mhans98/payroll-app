@@ -1292,24 +1292,24 @@ export default function App() {
                       body { font-family: Arial, sans-serif; }
                       .page { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 8px; padding: 8px; height: 100vh; page-break-after: always; }
                       .page:last-child { page-break-after: avoid; }
-                      .slip { border: 1px dashed #999; padding: 10px; display: flex; flex-direction: column; font-size: 10px; }
-                      .slip-header { text-align: center; border-bottom: 2px solid #1a1a2e; padding-bottom: 5px; margin-bottom: 5px; }
-                      .slip-header h4 { font-size: 12px; margin: 0; }
-                      .slip-header p { font-size: 9px; color: #666; margin: 2px 0 0 0; }
-                      .slip-info { margin-bottom: 5px; font-size: 9px; }
-                      .slip-info div { margin: 2px 0; }
-                      .slip-attendance { background: #f5f5f5; padding: 5px; border-radius: 3px; margin-bottom: 5px; display: flex; justify-content: space-between; font-size: 9px; }
-                      table { width: 100%; border-collapse: collapse; margin-bottom: 5px; }
-                      td { padding: 3px 0; border-bottom: 1px solid #eee; font-size: 9px; }
+                     .slip { border: 1px dashed #999; padding: 15px; display: flex; flex-direction: column; font-size: 12px; height: 100%; }
+                      .slip-header { text-align: center; border-bottom: 2px solid #1a1a2e; padding-bottom: 10px; margin-bottom: 10px; }
+                      .slip-header h4 { font-size: 16px; margin: 0; }
+                      .slip-header p { font-size: 12px; color: #666; margin: 4px 0 0 0; }
+                      .slip-info { margin-bottom: 10px; font-size: 12px; }
+                      .slip-info div { margin: 4px 0; }
+                      .slip-attendance { background: #f5f5f5; padding: 8px; border-radius: 4px; margin-bottom: 10px; display: flex; justify-content: space-between; font-size: 12px; }
+                      table { width: 100%; border-collapse: collapse; margin-bottom: 10px; flex-grow: 1; }
+                      td { padding: 6px 0; border-bottom: 1px solid #eee; font-size: 12px; }
                       td:last-child { text-align: right; }
                       .total { background: #e8f5e9; font-weight: bold; }
-                      .total td { border-bottom: none; }
+                      .total td { border-bottom: none; padding: 8px 0; }
                       .deduct { background: #ffebee; color: #c00; }
-                      .deduct td { border-bottom: none; }
-                      .net-pay { background: #059669; color: white; padding: 6px 8px; border-radius: 4px; display: flex; justify-content: space-between; font-weight: bold; font-size: 11px; }
-                      .signatures { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px; font-size: 8px; text-align: center; }
-                      .signatures p { margin-bottom: 20px; color: #666; }
-                      .signatures > div > div { border-top: 1px solid #999; padding-top: 3px; }
+                      .deduct td { border-bottom: none; padding: 8px 0; }
+                      .net-pay { background: #059669; color: white; padding: 10px 12px; border-radius: 6px; display: flex; justify-content: space-between; font-weight: bold; font-size: 14px; margin-top: auto; }
+                      .signatures { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 15px; font-size: 11px; text-align: center; }
+                      .signatures p { margin-bottom: 35px; color: #666; }
+                      .signatures > div > div { border-top: 1px solid #999; padding-top: 5px; }
                       @media print { @page { margin: 5mm; size: A4; } }
                     </style>
                   </head>
