@@ -579,10 +579,14 @@ export default function App() {
                 <label style={styles.label}>Hari Hadir</label>
                 <input
                   type="number"
-                  value={entry.hari_hadir || 0}
+                  defaultValue={entry.hari_hadir || 0}
+                  key={`hari_${entry.id}_${entry.hari_hadir}`}
                   min="0"
                   max="7"
-                  onChange={(e) => updatePayrollEntry(entry.id, { hari_hadir: parseInt(e.target.value) || 0 })}
+                  onBlur={(e) => {
+                    const val = parseInt(e.target.value) || 0;
+                    if (val !== (entry.hari_hadir || 0)) updatePayrollEntry(entry.id, { hari_hadir: val });
+                  }}
                   style={{ ...styles.input, textAlign: 'center', fontSize: '1.25rem', fontWeight: '600' }}
                 />
                 <p style={{ color: '#9ca3af', fontSize: '0.75rem', marginTop: '4px', textAlign: 'center' }}>Maks: 7 hari</p>
