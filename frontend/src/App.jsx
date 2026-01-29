@@ -1269,49 +1269,90 @@ export default function App() {
                 </div>
               </div>
             ) : (
-              /* BATCH SLIPS - 3 per page */
+              /* BATCH SLIPS - 4 per page (2x2) */
               <div>
-                <p style={{ marginBottom: '16px', color: '#6b7280', fontSize: '0.875rem' }}>💡 Format 3 slip per halaman - potong sesuai garis putus-putus</p>
-                {Array.from({ length: Math.ceil(payrollEntries.length / 3) }, (_, pageIdx) => (
+                <p style={{ marginBottom: '16px', color: '#6b7280', fontSize: '0.875rem' }}>💡 Format 4 slip per halaman (2x2) - potong sesuai garis putus-putus</p>
+                {Array.from({ length: Math.ceil(payrollEntries.length / 4) }, (_, pageIdx) => (
                   <div key={pageIdx} style={{ background: 'white', marginBottom: '24px', padding: '16px', borderRadius: '8px' }}>
                     <p style={{ color: '#9ca3af', fontSize: '0.75rem', marginBottom: '8px' }}>Halaman {pageIdx + 1}</p>
-                    {payrollEntries.slice(pageIdx * 3, (pageIdx + 1) * 3).map(entry => {
-                      const calc = calculatePayroll(entry);
-                      const lemburArray = JSON.parse(entry.lembur_per_hari || '[0,0,0,0,0,0,0]');
-                      return (
-                        <div key={entry.id} style={{ border: '1px dashed #cbd5e1', padding: '16px', marginBottom: '8px', fontSize: '0.75rem' }}>
-                          <div style={{ textAlign: 'center', marginBottom: '12px', borderBottom: '2px solid #1a1a2e', paddingBottom: '8px' }}>
-                            <h4 style={{ fontSize: '0.875rem', fontWeight: '700' }}>SLIP GAJI MINGGUAN</h4>
-                            <p style={{ color: '#4b5563', fontSize: '0.7rem' }}>CV. Kreasi Indah Jaya</p>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                      {payrollEntries.slice(pageIdx * 4, (pageIdx + 1) * 4).map(entry => {
+                        const calc = calculatePayroll(entry);
+                        const lemburArray = JSON.parse(entry.lembur_per_hari || '[0,0,0,0,0,0,0]');
+                        return (
+                          <div key={entry.id} style={{ border: '1px dashed #cbd5e1', padding: '12px', fontSize: '0.65rem' }}>
+                            <div style={{ textAlign: 'center', marginBottom: '8px', borderBottom: '2px solid #1a1a2e', paddingBottom: '6px' }}>
+                              <h4 style={{ fontSize: '0.75rem', fontWeight: '700', margin: 0 }}>SLIP GAJI MINGGUAN</h4>
+                              <p style={{ color: '#4b5563', fontSize: '0.6rem', margin: 0 }}>CV. Kreasi Indah Jaya</p>
+                            </div>
+                            <div style={{ marginBottom: '6px', fontSize: '0.6rem' }}>
+                              <div><span style={{ color: '#6b7280' }}>Periode:</span> <strong>{selectedWeek.range}</strong></div>
+                              <div><span style={{ color: '#6b7280' }}>Karyawan:</span> <strong>{entry.emp_code} – {entry.name}</strong></div>
+                            </div>
+                            <div style={{ background: '#f8fafc', padding: '6px', borderRadius: '4px', marginBottom: '6px', fontSize: '0.6rem' }}>
+                              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                <span><strong>Hari Hadir:</strong> {entry.hari_hadir || 0}</span>
+                                <span><strong>Lembur:</strong> {calc?.totalLembur || 0} jam</span>
+                              </div>
+                            </div>
+                            <table style={{ width: '100%', fontSize: '0.6rem', marginBottom: '6px' }}>
+                              <tbody>
+                                <tr style={{ borderBottom: '1px solid #e5e7eb' }}>
+                                  <td style={{ padding: '3px 0' }}>Gaji Pokok</td>
+                                  <td style={{ textAlign: 'right', padding: '3px 0' }}>{formatRp(calc?.gaji)}</td>
+                                </tr>
+                                <tr style={{ borderBottom: '1px solid #e5e7eb' }}>
+                                  <td style={{ padding: '3px 0' }}>Upah Lembur</td>
+                                  <td style={{ textAlign: 'right', padding: '3px 0' }}>{formatRp(calc?.lembur)}</td>
+                                </tr>
+                                <tr style={{ borderBottom: '1px solid #e5e7eb' }}>
+                                  <td style={{ padding: '3px 0' }}>Transport</td>
+                                  <td style={{ textAlign: 'right', padding: '3px 0' }}>{formatRp(calc?.transport)}</td>
+                                </tr>
+                                <tr style={{ borderBottom: '1px solid #e5e7eb' }}>
+                                  <td style={{ padding: '3px 0' }}>Uang Makan</td>
+                                  <td style={{ textAlign: 'right', padding: '3px 0' }}>{formatRp(calc?.makan)}</td>
+                                </tr>
+                                <tr style={{ borderBottom: '1px solid #e5e7eb' }}>
+                                  <td style={{ padding: '3px 0' }}>Kerajinan</td>
+                                  <td style={{ textAlign: 'right', padding: '3px 0' }}>{formatRp(calc?.kerajinan)}</td>
+                                </tr>
+                                {calc?.tambahanList?.map((item, idx) => (
+                                  <tr key={idx} style={{ borderBottom: '1px solid #e5e7eb' }}>
+                                    <td style={{ padding: '3px 0' }}>{item.nama || 'Tambahan'}</td>
+                                    <td style={{ textAlign: 'right', padding: '3px 0' }}>{formatRp(item.nominal)}</td>
+                                  </tr>
+                                ))}
+                                <tr style={{ background: '#f0fdf4' }}>
+                                  <td style={{ padding: '4px 0', fontWeight: '600' }}>Total Pendapatan</td>
+                                  <td style={{ textAlign: 'right', padding: '4px 0', fontWeight: '600' }}>{formatRp(calc?.totalPendapatan)}</td>
+                                </tr>
+                                {(calc?.potonganPinjaman || 0) > 0 && (
+                                  <tr style={{ background: '#fef2f2' }}>
+                                    <td style={{ padding: '4px 0', fontWeight: '600' }}>Pot. Pinjaman</td>
+                                    <td style={{ textAlign: 'right', padding: '4px 0', fontWeight: '600', color: '#dc2626' }}>({formatRp(calc?.potonganPinjaman)})</td>
+                                  </tr>
+                                )}
+                              </tbody>
+                            </table>
+                            <div style={{ background: '#059669', color: 'white', padding: '6px 8px', borderRadius: '6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                              <span style={{ fontWeight: '600', fontSize: '0.6rem' }}>GAJI BERSIH</span>
+                              <span style={{ fontWeight: '700', fontSize: '0.75rem' }}>{formatRp(calc?.gajiBersih)}</span>
+                            </div>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginTop: '8px', fontSize: '0.55rem' }}>
+                              <div style={{ textAlign: 'center' }}>
+                                <p style={{ color: '#6b7280', marginBottom: '20px' }}>Dibuat oleh,</p>
+                                <div style={{ borderTop: '1px solid #d1d5db', paddingTop: '4px' }}>(..............)</div>
+                              </div>
+                              <div style={{ textAlign: 'center' }}>
+                                <p style={{ color: '#6b7280', marginBottom: '20px' }}>Diterima oleh,</p>
+                                <div style={{ borderTop: '1px solid #d1d5db', paddingTop: '4px' }}>(..............)</div>
+                              </div>
+                            </div>
                           </div>
-                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px', marginBottom: '8px' }}>
-                            <div>Periode: <strong>{selectedWeek.range}</strong></div>
-                            <div>Karyawan: <strong>{entry.emp_code} - {entry.name}</strong></div>
-                            <div>Hari Hadir: <strong>{entry.hari_hadir || 0}</strong></div>
-                            <div>Total Lembur: <strong>{calc?.totalLembur || 0} jam</strong></div>
-                          </div>
-                          <table style={{ ...styles.table, fontSize: '0.65rem', marginBottom: '8px' }}>
-                            <tbody>
-                              <tr><td>Gaji Pokok</td><td style={{ textAlign: 'right' }}>{formatRp(calc?.gaji)}</td></tr>
-                              <tr><td>Lembur</td><td style={{ textAlign: 'right' }}>{formatRp(calc?.lembur)}</td></tr>
-                              <tr><td>Transport</td><td style={{ textAlign: 'right' }}>{formatRp(calc?.transport)}</td></tr>
-                              <tr><td>Makan</td><td style={{ textAlign: 'right' }}>{formatRp(calc?.makan)}</td></tr>
-                              <tr><td>Kerajinan</td><td style={{ textAlign: 'right' }}>{formatRp(calc?.kerajinan)}</td></tr>
-                              {calc?.tambahanList?.map((item, idx) => (
-                                <tr key={idx}><td>{item.nama || 'Tambahan'}</td><td style={{ textAlign: 'right' }}>{formatRp(item.nominal)}</td></tr>
-                              ))}
-                              {(calc?.potonganPinjaman || 0) > 0 && (
-                                <tr style={{ color: '#dc2626' }}><td>Pot. Pinjaman</td><td style={{ textAlign: 'right' }}>({formatRp(calc?.potonganPinjaman)})</td></tr>
-                              )}
-                            </tbody>
-                          </table>
-                          <div style={{ background: '#059669', color: 'white', padding: '8px', borderRadius: '6px', display: 'flex', justifyContent: 'space-between' }}>
-                            <span style={{ fontWeight: '600' }}>GAJI BERSIH</span>
-                            <span style={{ fontWeight: '700' }}>{formatRp(calc?.gajiBersih)}</span>
-                          </div>
-                        </div>
-                      );
-                    })}
+                        );
+                      })}
+                    </div>
                   </div>
                 ))}
               </div>
