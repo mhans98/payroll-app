@@ -22,6 +22,13 @@ async function api(endpoint, options = {}) {
 // UTILITY FUNCTIONS
 // =====================================================
 const formatRp = (num) => `Rp ${(num || 0).toLocaleString('id-ID')}`;
+
+// Debounce function - waits until user stops typing
+const debounceTimers = {};
+function debouncedUpdate(key, fn, delay = 800) {
+  if (debounceTimers[key]) clearTimeout(debounceTimers[key]);
+  debounceTimers[key] = setTimeout(fn, delay);
+}
 const roundUp1000 = (num) => Math.ceil(num / 1000) * 1000;
 
 // Get week dates (Sunday to Saturday)
