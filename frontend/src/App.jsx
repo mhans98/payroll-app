@@ -877,8 +877,8 @@ export default function App() {
                 <input
                   type="text"
                   value={form.employee_id}
-                  onChange={e => setForm({ ...form, employee_id: e.target.value })}
-                  style={styles.input}
+                  disabled
+                  style={{ ...styles.input, background: '#f3f4f6', color: '#6b7280' }}
                 />
               </div>
               <div>
