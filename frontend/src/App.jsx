@@ -1249,7 +1249,7 @@ export default function App() {
                       </div>
                       <div class="slip-info">
                         <div>Periode: <strong>${selectedWeek.range}</strong></div>
-                        <div>Karyawan: <strong>${entry.emp_code} – ${entry.name}</strong></div>
+                        <div>Karyawan: <strong>${entry.name}</strong></div>
                       </div>
                       <div class="slip-attendance">
                         <span><strong>Hari Hadir:</strong> ${entry.hari_hadir || 0}</span>
@@ -1265,10 +1265,6 @@ export default function App() {
                         <tr class="total"><td>Total Pendapatan</td><td>${formatRp(calc?.totalPendapatan)}</td></tr>
                         ${(calc?.potonganPinjaman || 0) > 0 ? `<tr class="deduct"><td>Pot. Pinjaman</td><td>(${formatRp(calc?.potonganPinjaman)})</td></tr>` : ''}
                       </table>
-                      <div class="net-pay">
-                        <span>GAJI BERSIH</span>
-                        <span>${formatRp(calc?.gajiBersih)}</span>
-                      </div>
                       <div class="signatures">
                         <div><p>Dibuat oleh,</p><div>(..............)</div></div>
                         <div><p>Diterima oleh,</p><div>(..............)</div></div>
