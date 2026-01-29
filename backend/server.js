@@ -121,11 +121,11 @@ app.post('/api/employees', async (req, res) => {
   try {
     const { employee_id, name, gaji_per_hari, lembur_per_jam, transport_per_hari, makan_per_hari } = req.body;
     
-    const result = await pool.query(`
-      INSERT INTO employees (employee_id, name, gaji_per_hari, lembur_per_jam, transport_per_hari, makan_per_hari)
-      VALUES ($1, $2, $3, $4, $5, $6)
+ const result = await pool.query(`
+      INSERT INTO employees (employee_id, name, gaji_per_hari, lembur_per_jam, transport_per_hari, makan_per_hari, kerajinan_default)
+      VALUES ($1, $2, $3, $4, $5, $6, $7)
       RETURNING *
-    `, [employee_id, name, gaji_per_hari || 0, lembur_per_jam || 0, transport_per_hari || 0, makan_per_hari || 0]);
+    `, [employee_id, name, gaji_per_hari || 0, lembur_per_jam || 0, transport_per_hari || 0, makan_per_hari || 0, req.body.kerajinan_default || 0]);
     
     await logAudit('employees', result.rows[0].id, 'INSERT', null, result.rows[0]);
     res.status(201).json(result.rows[0]);
@@ -144,11 +144,11 @@ app.put('/api/employees/:id', async (req, res) => {
 
     const { employee_id, name, gaji_per_hari, lembur_per_jam, transport_per_hari, makan_per_hari, is_active } = req.body;
     
-    const result = await pool.query(`
+   const result = await pool.query(`
       UPDATE employees 
       SET employee_id = $1, name = $2, gaji_per_hari = $3, lembur_per_jam = $4, 
-          transport_per_hari = $5, makan_per_hari = $6, is_active = $7, updated_at = CURRENT_TIMESTAMP
-      WHERE id = $8
+          transport_per_hari = $5, makan_per_hari = $6, kerajinan_default = $7, is_active = $8, updated_at = CURRENT_TIMESTAMP
+      WHERE id = $9
       RETURNING *
     `, [
       employee_id || oldEmployee.employee_id,
@@ -157,6 +157,7 @@ app.put('/api/employees/:id', async (req, res) => {
       lembur_per_jam ?? oldEmployee.lembur_per_jam,
       transport_per_hari ?? oldEmployee.transport_per_hari,
       makan_per_hari ?? oldEmployee.makan_per_hari,
+      req.body.kerajinan_default ?? oldEmployee.kerajinan_default ?? 0,
       is_active ?? oldEmployee.is_active,
       req.params.id
     ]);
