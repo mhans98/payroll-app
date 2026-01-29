@@ -626,12 +626,16 @@ export default function App() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 <div>
                   <label style={styles.label}>Kerajinan</label>
-                  <input
+                 <input
                     type="number"
-                    value={entry.kerajinan || 0}
+                    defaultValue={entry.kerajinan || 0}
+                    key={`kerajinan_${entry.id}_${entry.kerajinan}`}
                     min="0"
                     step="1000"
-                    onChange={(e) => updatePayrollEntry(entry.id, { kerajinan: parseInt(e.target.value) || 0 })}
+                    onBlur={(e) => {
+                      const val = parseInt(e.target.value) || 0;
+                      if (val !== (entry.kerajinan || 0)) updatePayrollEntry(entry.id, { kerajinan: val });
+                    }}
                     style={styles.input}
                   />
                 </div>
@@ -641,24 +645,32 @@ export default function App() {
                     <div key={idx} style={{ display: 'flex', gap: '4px', marginBottom: '4px' }}>
                       <input
                         type="text"
-                        value={item.nama}
+                        defaultValue={item.nama}
+                        key={`tambahan_nama_${entry.id}_${idx}_${item.nama}`}
                         placeholder="Nama"
                         style={{ ...styles.input, flex: 1, padding: '6px 8px', fontSize: '0.8rem' }}
-                        onChange={(e) => {
-                          const arr = JSON.parse(entry.tambahan_lainnya || '[]');
-                          arr[idx].nama = e.target.value;
-                          updatePayrollEntry(entry.id, { tambahan_lainnya: arr });
+                        onBlur={(e) => {
+                          const val = e.target.value;
+                          if (val !== item.nama) {
+                            const arr = JSON.parse(entry.tambahan_lainnya || '[]');
+                            arr[idx].nama = val;
+                            updatePayrollEntry(entry.id, { tambahan_lainnya: arr });
+                          }
                         }}
                       />
                       <input
                         type="number"
-                        value={item.nominal}
+                        defaultValue={item.nominal}
+                        key={`tambahan_nominal_${entry.id}_${idx}_${item.nominal}`}
                         placeholder="Nominal"
                         style={{ ...styles.input, width: '100px', padding: '6px 8px', fontSize: '0.8rem' }}
-                        onChange={(e) => {
-                          const arr = JSON.parse(entry.tambahan_lainnya || '[]');
-                          arr[idx].nominal = parseInt(e.target.value) || 0;
-                          updatePayrollEntry(entry.id, { tambahan_lainnya: arr });
+                        onBlur={(e) => {
+                          const val = parseInt(e.target.value) || 0;
+                          if (val !== item.nominal) {
+                            const arr = JSON.parse(entry.tambahan_lainnya || '[]');
+                            arr[idx].nominal = val;
+                            updatePayrollEntry(entry.id, { tambahan_lainnya: arr });
+                          }
                         }}
                       />
                       <button
@@ -686,10 +698,14 @@ export default function App() {
                   <label style={styles.label}>Pot. Pinjaman</label>
                   <input
                     type="number"
-                    value={entry.potongan_pinjaman || 0}
+                    defaultValue={entry.potongan_pinjaman || 0}
+                    key={`pinjaman_${entry.id}_${entry.potongan_pinjaman}`}
                     min="0"
                     step="1000"
-                    onChange={(e) => updatePayrollEntry(entry.id, { potongan_pinjaman: parseInt(e.target.value) || 0 })}
+                    onBlur={(e) => {
+                      const val = parseInt(e.target.value) || 0;
+                      if (val !== (entry.potongan_pinjaman || 0)) updatePayrollEntry(entry.id, { potongan_pinjaman: val });
+                    }}
                     style={{
                       ...styles.input,
                       borderColor: isOverLimit ? '#dc2626' : '#e5e7eb',
