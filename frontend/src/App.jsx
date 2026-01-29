@@ -852,13 +852,14 @@ export default function App() {
   // MODAL: EMPLOYEE FORM
   // =====================================================
   const EmployeeModal = () => {
-    const [form, setForm] = useState(editingEmployee || {
+        const [form, setForm] = useState(editingEmployee || {
       employee_id: `EMP${String(employees.length + 1).padStart(3, '0')}`,
       name: '',
       gaji_per_hari: 70000,
       lembur_per_jam: 15000,
       transport_per_hari: 15000,
-      makan_per_hari: 20000
+      makan_per_hari: 20000,
+      kerajinan_default: 0
     });
 
     return (
@@ -916,12 +917,21 @@ export default function App() {
                   style={styles.input}
                 />
               </div>
-              <div>
+               <div>
                 <label style={styles.label}>Uang Makan per Hari (Rp)</label>
                 <input
                   type="number"
                   value={form.makan_per_hari}
                   onChange={e => setForm({ ...form, makan_per_hari: parseInt(e.target.value) || 0 })}
+                  style={styles.input}
+                />
+              </div>
+              <div>
+                <label style={styles.label}>Kerajinan Default (Rp)</label>
+                <input
+                  type="number"
+                  value={form.kerajinan_default || 0}
+                  onChange={e => setForm({ ...form, kerajinan_default: parseInt(e.target.value) || 0 })}
                   style={styles.input}
                 />
               </div>
