@@ -1238,7 +1238,88 @@ export default function App() {
             </h3>
             <div style={{ display: 'flex', gap: '8px' }}>
               <button onClick={() => setShowPrintModal(false)} style={{ ...styles.button, ...styles.buttonOutline }}>✕ Tutup</button>
-              <button onClick={() => window.print()} style={{ ...styles.button, ...styles.buttonPrimary }}>🖨️ Cetak</button>
+              <button onClick={() => {
+                const slips = payrollEntries.map(entry => {
+                  const calc = calculatePayroll(entry);
+                  return `
+                    <div class="slip">
+                      <div class="slip-header">
+                        <h4>SLIP GAJI MINGGUAN</h4>
+                        <p>CV. Kreasi Indah Jaya</p>
+                      </div>
+                      <div class="slip-info">
+                        <div>Periode: <strong>${selectedWeek.range}</strong></div>
+                        <div>Karyawan: <strong>${entry.emp_code} – ${entry.name}</strong></div>
+                      </div>
+                      <div class="slip-attendance">
+                        <span><strong>Hari Hadir:</strong> ${entry.hari_hadir || 0}</span>
+                        <span><strong>Lembur:</strong> ${calc?.totalLembur || 0} jam</span>
+                      </div>
+                      <table>
+                        <tr><td>Gaji Pokok</td><td>${formatRp(calc?.gaji)}</td></tr>
+                        <tr><td>Upah Lembur</td><td>${formatRp(calc?.lembur)}</td></tr>
+                        <tr><td>Transport</td><td>${formatRp(calc?.transport)}</td></tr>
+                        <tr><td>Uang Makan</td><td>${formatRp(calc?.makan)}</td></tr>
+                        <tr><td>Kerajinan</td><td>${formatRp(calc?.kerajinan)}</td></tr>
+                        ${(calc?.tambahanList || []).map(t => `<tr><td>${t.nama || 'Tambahan'}</td><td>${formatRp(t.nominal)}</td></tr>`).join('')}
+                        <tr class="total"><td>Total Pendapatan</td><td>${formatRp(calc?.totalPendapatan)}</td></tr>
+                        ${(calc?.potonganPinjaman || 0) > 0 ? `<tr class="deduct"><td>Pot. Pinjaman</td><td>(${formatRp(calc?.potonganPinjaman)})</td></tr>` : ''}
+                      </table>
+                      <div class="net-pay">
+                        <span>GAJI BERSIH</span>
+                        <span>${formatRp(calc?.gajiBersih)}</span>
+                      </div>
+                      <div class="signatures">
+                        <div><p>Dibuat oleh,</p><div>(..............)</div></div>
+                        <div><p>Diterima oleh,</p><div>(..............)</div></div>
+                      </div>
+                    </div>
+                  `;
+                });
+                
+                const pages = [];
+                for (let i = 0; i < slips.length; i += 4) {
+                  pages.push(`<div class="page">${slips.slice(i, i + 4).join('')}</div>`);
+                }
+                
+                const printWindow = window.open('', '_blank');
+                printWindow.document.write(`
+                  <html>
+                  <head>
+                    <title>Slip Gaji - CV. Kreasi Indah Jaya</title>
+                    <style>
+                      * { margin: 0; padding: 0; box-sizing: border-box; }
+                      body { font-family: Arial, sans-serif; }
+                      .page { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 8px; padding: 8px; height: 100vh; page-break-after: always; }
+                      .page:last-child { page-break-after: avoid; }
+                      .slip { border: 1px dashed #999; padding: 10px; display: flex; flex-direction: column; font-size: 10px; }
+                      .slip-header { text-align: center; border-bottom: 2px solid #1a1a2e; padding-bottom: 5px; margin-bottom: 5px; }
+                      .slip-header h4 { font-size: 12px; margin: 0; }
+                      .slip-header p { font-size: 9px; color: #666; margin: 2px 0 0 0; }
+                      .slip-info { margin-bottom: 5px; font-size: 9px; }
+                      .slip-info div { margin: 2px 0; }
+                      .slip-attendance { background: #f5f5f5; padding: 5px; border-radius: 3px; margin-bottom: 5px; display: flex; justify-content: space-between; font-size: 9px; }
+                      table { width: 100%; border-collapse: collapse; margin-bottom: 5px; }
+                      td { padding: 3px 0; border-bottom: 1px solid #eee; font-size: 9px; }
+                      td:last-child { text-align: right; }
+                      .total { background: #e8f5e9; font-weight: bold; }
+                      .total td { border-bottom: none; }
+                      .deduct { background: #ffebee; color: #c00; }
+                      .deduct td { border-bottom: none; }
+                      .net-pay { background: #059669; color: white; padding: 6px 8px; border-radius: 4px; display: flex; justify-content: space-between; font-weight: bold; font-size: 11px; }
+                      .signatures { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px; font-size: 8px; text-align: center; }
+                      .signatures p { margin-bottom: 20px; color: #666; }
+                      .signatures > div > div { border-top: 1px solid #999; padding-top: 3px; }
+                      @media print { @page { margin: 5mm; size: A4; } }
+                    </style>
+                  </head>
+                  <body>${pages.join('')}</body>
+                  </html>
+                `);
+                printWindow.document.close();
+                printWindow.focus();
+                printWindow.print();
+              }} style={{ ...styles.button, ...styles.buttonPrimary }}>🖨️ Cetak</button>
             </div>
           </div>
 
