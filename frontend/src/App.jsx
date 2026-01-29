@@ -601,12 +601,16 @@ export default function App() {
                       <p style={{ fontSize: '0.7rem', color: '#6b7280', marginBottom: '4px' }}>{day}</p>
                       <input
                         type="number"
-                        value={lemburArray[idx] || 0}
+                        defaultValue={lemburArray[idx] || 0}
+                        key={`lembur_${entry.id}_${idx}_${lemburArray[idx]}`}
                         min="0"
-                        onChange={(e) => {
-                          const newArr = [...lemburArray];
-                          newArr[idx] = parseInt(e.target.value) || 0;
-                          updatePayrollEntry(entry.id, { lembur_per_hari: newArr });
+                        onBlur={(e) => {
+                          const val = parseInt(e.target.value) || 0;
+                          if (val !== (lemburArray[idx] || 0)) {
+                            const newArr = [...lemburArray];
+                            newArr[idx] = val;
+                            updatePayrollEntry(entry.id, { lembur_per_hari: newArr });
+                          }
                         }}
                         style={{ ...styles.input, padding: '8px 2px', textAlign: 'center' }}
                       />
