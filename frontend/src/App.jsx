@@ -1266,6 +1266,9 @@ export default function App() {
                               <tr><td>Transport</td><td style={{ textAlign: 'right' }}>{formatRp(calc?.transport)}</td></tr>
                               <tr><td>Makan</td><td style={{ textAlign: 'right' }}>{formatRp(calc?.makan)}</td></tr>
                               <tr><td>Kerajinan</td><td style={{ textAlign: 'right' }}>{formatRp(calc?.kerajinan)}</td></tr>
+                              {calc?.tambahanList?.map((item, idx) => (
+                                <tr key={idx}><td>{item.nama || 'Tambahan'}</td><td style={{ textAlign: 'right' }}>{formatRp(item.nominal)}</td></tr>
+                              ))}
                               {(calc?.potonganPinjaman || 0) > 0 && (
                                 <tr style={{ color: '#dc2626' }}><td>Pot. Pinjaman</td><td style={{ textAlign: 'right' }}>({formatRp(calc?.potonganPinjaman)})</td></tr>
                               )}
