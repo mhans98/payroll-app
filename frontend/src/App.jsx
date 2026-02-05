@@ -580,14 +580,15 @@ export default function App() {
               {/* Hari Hadir */}
               <div>
                 <label style={styles.label}>Hari Hadir</label>
-                <input
+              <input
                   type="number"
                   defaultValue={entry.hari_hadir || 0}
                   key={`hari_${entry.id}_${entry.hari_hadir}`}
                   min="0"
                   max="7"
+                  step="0.5"
                   onBlur={(e) => {
-                    const val = parseInt(e.target.value) || 0;
+                    const val = parseFloat(e.target.value) || 0;
                     if (val !== (entry.hari_hadir || 0)) updatePayrollEntry(entry.id, { hari_hadir: val });
                   }}
                   style={{ ...styles.input, textAlign: 'center', fontSize: '1.25rem', fontWeight: '600' }}
@@ -607,8 +608,9 @@ export default function App() {
                         defaultValue={lemburArray[idx] || 0}
                         key={`lembur_${entry.id}_${idx}_${lemburArray[idx]}`}
                         min="0"
+                        step="0.5"
                         onBlur={(e) => {
-                          const val = parseInt(e.target.value) || 0;
+                          const val = parseFloat(e.target.value) || 0;
                           if (val !== (lemburArray[idx] || 0)) {
                             const newArr = [...lemburArray];
                             newArr[idx] = val;
