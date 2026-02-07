@@ -125,6 +125,7 @@ export default function App() {
   const [printMode, setPrintMode] = useState('batch'); // 'batch' | 'daftarbayar'
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [editingEmployee, setEditingEmployee] = useState(null);
+  const [editingLoan, setEditingLoan] = useState(null);
 
   // =====================================================
   // DATA LOADING
@@ -245,10 +246,37 @@ export default function App() {
   // =====================================================
   async function saveLoan(loanData) {
     try {
-      await api('/loans', { method: 'POST', body: loanData });
+      if (editingLoan) {
+        await api(`/loans/${editingLoan.id}`, { method: 'PUT', body: loanData });
+      } else {
+        await api('/loans', { method: 'POST', body: loanData });
+      }
       const lns = await api('/loans');
       setLoans(lns);
       setShowLoanModal(false);
+      setEditingLoan(null);
+    } catch (err) {
+      alert('Error: ' + err.message);
+    }
+  }
+
+  async function deleteLoan(id) {
+    if (!confirm('Yakin ingin menghapus pinjaman ini?')) return;
+    try {
+      await api(`/loans/${id}`, { method: 'DELETE' });
+      const lns = await api('/loans');
+      setLoans(lns);
+    } catch (err) {
+      alert('Error: ' + err.message);
+    }
+  }
+
+  async function markLoanPaid(id) {
+    if (!confirm('Tandai pinjaman ini sebagai LUNAS?')) return;
+    try {
+      await api(`/loans/${id}/paid`, { method: 'PUT' });
+      const lns = await api('/loans');
+      setLoans(lns);
     } catch (err) {
       alert('Error: ' + err.message);
     }
@@ -792,7 +820,21 @@ export default function App() {
                     width: `${paidPercent}%`
                   }} />
                 </div>
-                <p style={{ color: '#6b7280', fontSize: '0.75rem', marginTop: '4px', textAlign: 'right' }}>{paidPercent.toFixed(0)}% lunas</p>
+              <p style={{ color: '#6b7280', fontSize: '0.75rem', marginTop: '4px', textAlign: 'right' }}>{paidPercent.toFixed(0)}% lunas</p>
+              </div>
+              <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
+                <button
+                  onClick={() => { setEditingLoan(loan); setShowLoanModal(true); }}
+                  style={{ ...styles.button, ...styles.buttonOutline, flex: 1, padding: '8px' }}
+                >✏️ Edit</button>
+                <button
+                  onClick={() => markLoanPaid(loan.id)}
+                  style={{ ...styles.button, ...styles.buttonSuccess, flex: 1, padding: '8px' }}
+                >✅ Lunas</button>
+                <button
+                  onClick={() => deleteLoan(loan.id)}
+                  style={{ ...styles.button, padding: '8px', background: '#fee2e2', color: '#dc2626' }}
+                >🗑️</button>
               </div>
             </div>
           );
@@ -989,19 +1031,27 @@ export default function App() {
   // =====================================================
   // MODAL: LOAN FORM
   // =====================================================
-  const LoanModal = () => {
-    const [form, setForm] = useState({
+ const LoanModal = () => {
+    const [form, setForm] = useState(editingLoan ? {
+      loan_id: editingLoan.loan_id,
+      employee_id: editingLoan.employee_id,
+      principal: editingLoan.principal,
+      remaining: editingLoan.remaining,
+      start_date: editingLoan.start_date?.split('T')[0] || formatDateISO(new Date()),
+      notes: editingLoan.notes || ''
+    } : {
       loan_id: `LOAN${String(loans.length + 1).padStart(3, '0')}`,
       employee_id: employees[0]?.id || '',
       principal: 0,
+      remaining: 0,
       start_date: formatDateISO(new Date()),
       notes: ''
     });
 
     return (
-      <div style={styles.modal} onClick={() => setShowLoanModal(false)}>
+      <div style={styles.modal} onClick={() => { setShowLoanModal(false); setEditingLoan(null); }}>
         <div style={{ ...styles.card, maxWidth: '450px', width: '100%' }} onClick={e => e.stopPropagation()}>
-          <h3 style={{ fontWeight: '600', marginBottom: '20px' }}>Pinjaman Baru</h3>
+          <h3 style={{ fontWeight: '600', marginBottom: '20px' }}>{editingLoan ? 'Edit Pinjaman' : 'Pinjaman Baru'}</h3>
 
           <div style={{ display: 'grid', gap: '16px' }}>
             <div>
@@ -1031,10 +1081,21 @@ export default function App() {
               <input
                 type="number"
                 value={form.principal}
-                onChange={e => setForm({ ...form, principal: parseInt(e.target.value) || 0 })}
+                onChange={e => setForm({ ...form, principal: parseInt(e.target.value) || 0, remaining: editingLoan ? form.remaining : parseInt(e.target.value) || 0 })}
                 style={styles.input}
               />
             </div>
+            {editingLoan && (
+              <div>
+                <label style={styles.label}>Sisa Pinjaman (Rp)</label>
+                <input
+                  type="number"
+                  value={form.remaining}
+                  onChange={e => setForm({ ...form, remaining: parseInt(e.target.value) || 0 })}
+                  style={styles.input}
+                />
+              </div>
+            )}
             <div>
               <label style={styles.label}>Tanggal Pinjaman</label>
               <input
@@ -1056,7 +1117,7 @@ export default function App() {
           </div>
 
           <div style={{ display: 'flex', gap: '12px', marginTop: '24px', justifyContent: 'flex-end' }}>
-            <button onClick={() => setShowLoanModal(false)} style={{ ...styles.button, ...styles.buttonOutline }}>Batal</button>
+            <button onClick={() => { setShowLoanModal(false); setEditingLoan(null); }} style={{ ...styles.button, ...styles.buttonOutline }}>Batal</button>
             <button onClick={() => saveLoan(form)} style={{ ...styles.button, ...styles.buttonPrimary }}>Simpan</button>
           </div>
         </div>
