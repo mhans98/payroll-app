@@ -548,6 +548,44 @@ app.get('/api/export/weekly/:weekId', async (req, res) => {
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
+// Edit loan
+app.put('/api/loans/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { principal, remaining, notes } = req.body;
+    await pool.query(
+      'UPDATE loans SET principal = $1, remaining = $2, notes = $3 WHERE id = $4',
+      [principal, remaining, notes, id]
+    );
+    res.json({ message: 'Loan updated' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Delete loan
+app.delete('/api/loans/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    // Delete related payments first
+    await pool.query('DELETE FROM loan_payments WHERE loan_id = $1', [id]);
+    await pool.query('DELETE FROM loans WHERE id = $1', [id]);
+    res.json({ message: 'Loan deleted' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Mark loan as paid
+app.put('/api/loans/:id/paid', async (req, res) => {
+  try {
+    const { id } = req.params;
+    await pool.query('UPDATE loans SET remaining = 0 WHERE id = $1', [id]);
+    res.json({ message: 'Loan marked as paid' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
 // Reset all data (use carefully!)
 app.delete('/api/reset-all-data', async (req, res) => {
