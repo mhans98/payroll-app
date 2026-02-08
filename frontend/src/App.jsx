@@ -837,9 +837,8 @@ async function viewLoanHistory(loan) {
                 </div>
               <p style={{ color: '#6b7280', fontSize: '0.75rem', marginTop: '4px', textAlign: 'right' }}>{paidPercent.toFixed(0)}% lunas</p>
               </div>
-              <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
+             <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
                 <button
-                  <button
                   onClick={() => viewLoanHistory(loan)}
                   style={{ ...styles.button, ...styles.buttonOutline, flex: 1, padding: '8px' }}
                 >📜 Riwayat</button>
