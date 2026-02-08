@@ -125,7 +125,11 @@ export default function App() {
   const [printMode, setPrintMode] = useState('batch'); // 'batch' | 'daftarbayar'
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [editingEmployee, setEditingEmployee] = useState(null);
-  const [editingLoan, setEditingLoan] = useState(null);
+const [editingLoan, setEditingLoan] = useState(null);
+  const [showHistoryModal, setShowHistoryModal] = useState(false);
+  const [loanHistory, setLoanHistory] = useState([]);
+  const [selectedLoan, setSelectedLoan] = useState(null);
+
 
   // =====================================================
   // DATA LOADING
@@ -271,6 +275,17 @@ export default function App() {
     }
   }
 
+async function viewLoanHistory(loan) {
+    try {
+      const history = await api(`/loans/${loan.id}/history`);
+      setLoanHistory(history);
+      setSelectedLoan(loan);
+      setShowHistoryModal(true);
+    } catch (err) {
+      alert('Error: ' + err.message);
+    }
+  }
+  
   async function markLoanPaid(id) {
     if (!confirm('Tandai pinjaman ini sebagai LUNAS?')) return;
     try {
@@ -823,6 +838,11 @@ export default function App() {
               <p style={{ color: '#6b7280', fontSize: '0.75rem', marginTop: '4px', textAlign: 'right' }}>{paidPercent.toFixed(0)}% lunas</p>
               </div>
               <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
+                <button
+                  <button
+                  onClick={() => viewLoanHistory(loan)}
+                  style={{ ...styles.button, ...styles.buttonOutline, flex: 1, padding: '8px' }}
+                >📜 Riwayat</button>
                 <button
                   onClick={() => { setEditingLoan(loan); setShowLoanModal(true); }}
                   style={{ ...styles.button, ...styles.buttonOutline, flex: 1, padding: '8px' }}
@@ -1634,7 +1654,60 @@ export default function App() {
       {showEmployeeModal && <EmployeeModal />}
       {showLoanModal && <LoanModal />}
       {showSlipModal && <SlipModal />}
-      {showPrintModal && <PrintModal />}
+{showPrintModal && <PrintModal />}
+      {showHistoryModal && (
+        <div style={styles.modal} onClick={() => setShowHistoryModal(false)}>
+          <div style={{ ...styles.card, maxWidth: '500px', width: '100%', maxHeight: '80vh', overflow: 'auto' }} onClick={e => e.stopPropagation()}>
+            <h3 style={{ fontWeight: '600', marginBottom: '20px' }}>📜 Riwayat Pembayaran</h3>
+            
+            {selectedLoan && (
+              <div style={{ background: '#f8fafc', padding: '12px', borderRadius: '8px', marginBottom: '16px' }}>
+                <p><strong>{selectedLoan.name}</strong></p>
+                <p style={{ fontSize: '0.875rem', color: '#6b7280' }}>{selectedLoan.loan_id}</p>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '8px', fontSize: '0.875rem' }}>
+                  <span>Pokok: <strong>{formatRp(selectedLoan.principal)}</strong></span>
+                  <span>Sisa: <strong style={{ color: selectedLoan.remaining > 0 ? '#dc2626' : '#059669' }}>{formatRp(selectedLoan.remaining)}</strong></span>
+                </div>
+              </div>
+            )}
+
+            {loanHistory.length === 0 ? (
+              <p style={{ textAlign: 'center', color: '#6b7280', padding: '20px' }}>Belum ada pembayaran</p>
+            ) : (
+              <table style={styles.table}>
+                <thead>
+                  <tr>
+                    <th style={styles.th}>Tanggal</th>
+                    <th style={styles.th}>Periode</th>
+                    <th style={{ ...styles.th, textAlign: 'right' }}>Jumlah</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {loanHistory.map((h, idx) => (
+                    <tr key={idx}>
+                      <td style={styles.td}>{formatDate(h.paid_at)}</td>
+                      <td style={styles.td}>{h.week_label || '-'}</td>
+                      <td style={{ ...styles.td, textAlign: 'right', fontWeight: '600', color: '#059669' }}>{formatRp(h.amount)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+                <tfoot>
+                  <tr style={{ background: '#f0fdf4' }}>
+                    <td colSpan="2" style={{ ...styles.td, fontWeight: '600' }}>Total Dibayar</td>
+                    <td style={{ ...styles.td, textAlign: 'right', fontWeight: '700', color: '#059669' }}>
+                      {formatRp(loanHistory.reduce((sum, h) => sum + h.amount, 0))}
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
+            )}
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
+              <button onClick={() => setShowHistoryModal(false)} style={{ ...styles.button, ...styles.buttonOutline }}>Tutup</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
