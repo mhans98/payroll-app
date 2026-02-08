@@ -129,6 +129,9 @@ const [editingLoan, setEditingLoan] = useState(null);
   const [showHistoryModal, setShowHistoryModal] = useState(false);
   const [loanHistory, setLoanHistory] = useState([]);
   const [selectedLoan, setSelectedLoan] = useState(null);
+  const [showEmployeeHistoryModal, setShowEmployeeHistoryModal] = useState(false);
+  const [employeeHistory, setEmployeeHistory] = useState([]);
+  const [selectedEmployeeForHistory, setSelectedEmployeeForHistory] = useState(null);
 
 
   // =====================================================
@@ -274,7 +277,17 @@ const [editingLoan, setEditingLoan] = useState(null);
       alert('Error: ' + err.message);
     }
   }
-
+async function viewEmployeeHistory(emp) {
+    try {
+      const history = await api(`/employees/${emp.id}/loan-history`);
+      setEmployeeHistory(history);
+      setSelectedEmployeeForHistory(emp);
+      setShowEmployeeHistoryModal(true);
+    } catch (err) {
+      alert('Error: ' + err.message);
+    }
+  }
+  
 async function viewLoanHistory(loan) {
     try {
       const history = await api(`/loans/${loan.id}/history`);
@@ -532,6 +545,11 @@ async function viewLoanHistory(loan) {
                     ) : '—'}
                   </td>
                   <td style={{ ...styles.td, textAlign: 'center' }}>
+                    <button
+                      onClick={() => viewEmployeeHistory(emp)}
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', marginRight: '8px' }}
+                      title="Riwayat Pinjaman"
+                    >📜</button>
                     <button
                       onClick={() => { setEditingEmployee(emp); setShowEmployeeModal(true); }}
                       style={{ background: 'none', border: 'none', cursor: 'pointer', marginRight: '8px' }}
@@ -1703,6 +1721,60 @@ async function viewLoanHistory(loan) {
 
             <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
               <button onClick={() => setShowHistoryModal(false)} style={{ ...styles.button, ...styles.buttonOutline }}>Tutup</button>
+            </div>
+          </div>
+       </div>
+      )}
+      {showEmployeeHistoryModal && (
+        <div style={styles.modal} onClick={() => setShowEmployeeHistoryModal(false)}>
+          <div style={{ ...styles.card, maxWidth: '600px', width: '100%', maxHeight: '80vh', overflow: 'auto' }} onClick={e => e.stopPropagation()}>
+            <h3 style={{ fontWeight: '600', marginBottom: '20px' }}>📜 Riwayat Pembayaran Pinjaman</h3>
+            
+            {selectedEmployeeForHistory && (
+              <div style={{ background: '#f8fafc', padding: '12px', borderRadius: '8px', marginBottom: '16px' }}>
+                <p><strong>{selectedEmployeeForHistory.name}</strong></p>
+                <p style={{ fontSize: '0.875rem', color: '#6b7280' }}>{selectedEmployeeForHistory.employee_id}</p>
+                <div style={{ marginTop: '8px', fontSize: '0.875rem' }}>
+                  <span>Total Sisa Pinjaman: <strong style={{ color: '#dc2626' }}>{formatRp(getTotalLoanForEmployee(selectedEmployeeForHistory.id))}</strong></span>
+                </div>
+              </div>
+            )}
+
+            {employeeHistory.length === 0 ? (
+              <p style={{ textAlign: 'center', color: '#6b7280', padding: '20px' }}>Belum ada riwayat pembayaran</p>
+            ) : (
+              <table style={styles.table}>
+                <thead>
+                  <tr>
+                    <th style={styles.th}>Tanggal</th>
+                    <th style={styles.th}>ID Pinjaman</th>
+                    <th style={styles.th}>Periode</th>
+                    <th style={{ ...styles.th, textAlign: 'right' }}>Jumlah</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {employeeHistory.map((h, idx) => (
+                    <tr key={idx}>
+                      <td style={styles.td}>{formatDate(h.paid_at)}</td>
+                      <td style={styles.td}>{h.loan_id || '-'}</td>
+                      <td style={styles.td}>{h.week_label || '-'}</td>
+                      <td style={{ ...styles.td, textAlign: 'right', fontWeight: '600', color: '#059669' }}>{formatRp(h.amount)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+                <tfoot>
+                  <tr style={{ background: '#f0fdf4' }}>
+                    <td colSpan="3" style={{ ...styles.td, fontWeight: '600' }}>Total Dibayar</td>
+                    <td style={{ ...styles.td, textAlign: 'right', fontWeight: '700', color: '#059669' }}>
+                      {formatRp(employeeHistory.reduce((sum, h) => sum + h.amount, 0))}
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
+            )}
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
+              <button onClick={() => setShowEmployeeHistoryModal(false)} style={{ ...styles.button, ...styles.buttonOutline }}>Tutup</button>
             </div>
           </div>
         </div>
