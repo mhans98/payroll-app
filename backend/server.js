@@ -575,6 +575,23 @@ app.delete('/api/loans/:id', async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+// Get employee payment history (all loans)
+app.get('/api/employees/:id/loan-history', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await pool.query(`
+      SELECT lp.*, l.loan_id, l.principal, pw.week_label, pw.week_start, pw.week_end 
+      FROM loan_payments lp
+      LEFT JOIN loans l ON lp.loan_id = l.id
+      LEFT JOIN payroll_weeks pw ON lp.week_id = pw.id
+      WHERE lp.employee_id = $1
+      ORDER BY lp.paid_at DESC
+    `, [id]);
+    res.json(result.rows);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 // Get loan payment history
 app.get('/api/loans/:id/history', async (req, res) => {
   try {
