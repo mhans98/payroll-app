@@ -575,6 +575,22 @@ app.delete('/api/loans/:id', async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+// Get loan payment history
+app.get('/api/loans/:id/history', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await pool.query(`
+      SELECT lp.*, pw.week_label, pw.week_start, pw.week_end 
+      FROM loan_payments lp
+      LEFT JOIN payroll_weeks pw ON lp.week_id = pw.id
+      WHERE lp.loan_id = $1
+      ORDER BY lp.paid_at DESC
+    `, [id]);
+    res.json(result.rows);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
 // Mark loan as paid
 app.put('/api/loans/:id/paid', async (req, res) => {
