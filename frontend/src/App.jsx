@@ -131,7 +131,10 @@ const [editingLoan, setEditingLoan] = useState(null);
   const [selectedLoan, setSelectedLoan] = useState(null);
   const [showEmployeeHistoryModal, setShowEmployeeHistoryModal] = useState(false);
   const [employeeHistory, setEmployeeHistory] = useState([]);
-  const [selectedEmployeeForHistory, setSelectedEmployeeForHistory] = useState(null);
+ const [selectedEmployeeForHistory, setSelectedEmployeeForHistory] = useState(null);
+  const [showSalaryHistoryModal, setShowSalaryHistoryModal] = useState(false);
+  const [salaryHistory, setSalaryHistory] = useState([]);
+  const [selectedEmployeeForSalary, setSelectedEmployeeForSalary] = useState(null);
 
 
   // =====================================================
@@ -273,6 +276,16 @@ const [editingLoan, setEditingLoan] = useState(null);
       await api(`/loans/${id}`, { method: 'DELETE' });
       const lns = await api('/loans');
       setLoans(lns);
+    } catch (err) {
+      alert('Error: ' + err.message);
+    }
+  }
+  async function viewSalaryHistory(emp) {
+    try {
+      const history = await api(`/employees/${emp.id}/salary-history`);
+      setSalaryHistory(history);
+      setSelectedEmployeeForSalary(emp);
+      setShowSalaryHistoryModal(true);
     } catch (err) {
       alert('Error: ' + err.message);
     }
@@ -545,6 +558,11 @@ async function viewLoanHistory(loan) {
                     ) : '—'}
                   </td>
                   <td style={{ ...styles.td, textAlign: 'center' }}>
+                   <button
+                      onClick={() => viewSalaryHistory(emp)}
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', marginRight: '8px' }}
+                      title="Riwayat Gaji"
+                    >💰</button>
                     <button
                       onClick={() => viewEmployeeHistory(emp)}
                       style={{ background: 'none', border: 'none', cursor: 'pointer', marginRight: '8px' }}
@@ -1724,6 +1742,69 @@ async function viewLoanHistory(loan) {
             </div>
           </div>
        </div>
+      )}
+      {showSalaryHistoryModal && (
+        <div style={styles.modal} onClick={() => setShowSalaryHistoryModal(false)}>
+          <div style={{ ...styles.card, maxWidth: '800px', width: '100%', maxHeight: '80vh', overflow: 'auto' }} onClick={e => e.stopPropagation()}>
+            <h3 style={{ fontWeight: '600', marginBottom: '20px' }}>💰 Riwayat Gaji</h3>
+            
+            {selectedEmployeeForSalary && (
+              <div style={{ background: '#f8fafc', padding: '12px', borderRadius: '8px', marginBottom: '16px' }}>
+                <p><strong>{selectedEmployeeForSalary.name}</strong></p>
+                <p style={{ fontSize: '0.875rem', color: '#6b7280' }}>{selectedEmployeeForSalary.employee_id}</p>
+              </div>
+            )}
+
+            {salaryHistory.length === 0 ? (
+              <p style={{ textAlign: 'center', color: '#6b7280', padding: '20px' }}>Belum ada riwayat gaji</p>
+            ) : (
+              <table style={styles.table}>
+                <thead>
+                  <tr>
+                    <th style={styles.th}>Periode</th>
+                    <th style={{ ...styles.th, textAlign: 'center' }}>Hari</th>
+                    <th style={{ ...styles.th, textAlign: 'center' }}>Lembur</th>
+                    <th style={{ ...styles.th, textAlign: 'right' }}>Gaji</th>
+                    <th style={{ ...styles.th, textAlign: 'right' }}>Kerajinan</th>
+                    <th style={{ ...styles.th, textAlign: 'right' }}>Pot. Pinjaman</th>
+                    <th style={{ ...styles.th, textAlign: 'right' }}>Gaji Bersih</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {salaryHistory.map((h, idx) => {
+                    const calc = calculatePayroll(h);
+                    return (
+                      <tr key={idx}>
+                        <td style={styles.td}>{h.week_label || '-'}</td>
+                        <td style={{ ...styles.td, textAlign: 'center' }}>{h.hari_hadir || 0}</td>
+                        <td style={{ ...styles.td, textAlign: 'center' }}>{calc?.totalLembur || 0} jam</td>
+                        <td style={{ ...styles.td, textAlign: 'right' }}>{formatRp(calc?.gaji)}</td>
+                        <td style={{ ...styles.td, textAlign: 'right' }}>{formatRp(calc?.kerajinan)}</td>
+                        <td style={{ ...styles.td, textAlign: 'right', color: '#dc2626' }}>{(calc?.potonganPinjaman || 0) > 0 ? `(${formatRp(calc?.potonganPinjaman)})` : '-'}</td>
+                        <td style={{ ...styles.td, textAlign: 'right', fontWeight: '600', color: '#059669' }}>{formatRp(calc?.gajiBersih)}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+                <tfoot>
+                  <tr style={{ background: '#f0fdf4' }}>
+                    <td colSpan="6" style={{ ...styles.td, fontWeight: '600' }}>Total Semua</td>
+                    <td style={{ ...styles.td, textAlign: 'right', fontWeight: '700', color: '#059669' }}>
+                      {formatRp(salaryHistory.reduce((sum, h) => {
+                        const calc = calculatePayroll(h);
+                        return sum + (calc?.gajiBersih || 0);
+                      }, 0))}
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
+            )}
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
+              <button onClick={() => setShowSalaryHistoryModal(false)} style={{ ...styles.button, ...styles.buttonOutline }}>Tutup</button>
+            </div>
+          </div>
+        </div>
       )}
       {showEmployeeHistoryModal && (
         <div style={styles.modal} onClick={() => setShowEmployeeHistoryModal(false)}>
