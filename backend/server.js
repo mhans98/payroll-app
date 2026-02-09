@@ -635,7 +635,23 @@ app.put('/api/loans/:id/paid', async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-
+// Reset all payroll entries (keep employees & loans)
+app.delete('/api/reset-payroll', async (req, res) => {
+  try {
+    await pool.query(`
+      UPDATE payroll_entries SET 
+        hari_hadir = 0,
+        lembur_per_hari = '[0,0,0,0,0,0,0]',
+        kerajinan = 0,
+        potongan_pinjaman = 0,
+        tambahan_lainnya = '[]'
+    `);
+    await pool.query('DELETE FROM loan_payments');
+    res.json({ message: 'All payroll entries reset to 0' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 // Reset all data (use carefully!)
 app.delete('/api/reset-all-data', async (req, res) => {
   try {
