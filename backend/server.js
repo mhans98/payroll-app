@@ -584,7 +584,7 @@ app.get('/api/employees/:id/loan-history', async (req, res) => {
       FROM loan_payments lp
       LEFT JOIN loans l ON lp.loan_id = l.id
       LEFT JOIN payroll_weeks pw ON lp.week_id = pw.id
-      WHERE lp.employee_id = $1
+      WHERE l.employee_id = $1
       ORDER BY lp.paid_at DESC
     `, [id]);
     res.json(result.rows);
