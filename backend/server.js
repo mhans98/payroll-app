@@ -378,13 +378,18 @@ app.get('/api/loans/employee/:employeeId', async (req, res) => {
 
 app.post('/api/loans', async (req, res) => {
   try {
-    const { loan_id, employee_id, principal, start_date, notes } = req.body;
+    const { employee_id, principal, start_date, notes } = req.body;
     
-    const result = await pool.query(`
-      INSERT INTO loans (loan_id, employee_id, principal, remaining, start_date, notes)
-      VALUES ($1, $2, $3, $4, $5, $6)
-      RETURNING *
-    `, [loan_id, employee_id, principal, principal, start_date, notes || null]);
+    // Auto-generate loan_id
+    const countResult = await pool.query('SELECT COUNT(*) FROM loans');
+    const count = parseInt(countResult.rows[0].count) + 1;
+    const loan_id = `LOAN${String(count).padStart(3, '0')}`;
+    
+    const result = await pool.query(
+      `INSERT INTO loans (loan_id, employee_id, principal, remaining, start_date, notes)
+       VALUES ($1, $2, $3, $3, $4, $5) RETURNING *`,
+      [loan_id, employee_id, principal, start_date, notes]
+    );
     
     await logAudit('loans', result.rows[0].id, 'INSERT', null, result.rows[0]);
     res.status(201).json(result.rows[0]);
