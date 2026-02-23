@@ -1088,14 +1088,12 @@ async function viewLoanHistory(loan) {
   // =====================================================
  const LoanModal = () => {
     const [form, setForm] = useState(editingLoan ? {
-      loan_id: editingLoan.loan_id,
       employee_id: editingLoan.employee_id,
       principal: editingLoan.principal,
       remaining: editingLoan.remaining,
       start_date: editingLoan.start_date?.split('T')[0] || formatDateISO(new Date()),
       notes: editingLoan.notes || ''
     } : {
-      loan_id: `LOAN${String(loans.length + 1).padStart(3, '0')}`,
       employee_id: employees[0]?.id || '',
       principal: 0,
       remaining: 0,
@@ -1108,16 +1106,7 @@ async function viewLoanHistory(loan) {
         <div style={{ ...styles.card, maxWidth: '450px', width: '100%' }} onClick={e => e.stopPropagation()}>
           <h3 style={{ fontWeight: '600', marginBottom: '20px' }}>{editingLoan ? 'Edit Pinjaman' : 'Pinjaman Baru'}</h3>
 
-          <div style={{ display: 'grid', gap: '16px' }}>
-            <div>
-              <label style={styles.label}>ID Pinjaman</label>
-              <input
-                type="text"
-                value={form.loan_id}
-                onChange={e => setForm({ ...form, loan_id: e.target.value })}
-                style={styles.input}
-              />
-            </div>
+<div style={{ display: 'grid', gap: '16px' }}>
             <div>
               <label style={styles.label}>Karyawan</label>
               <select
