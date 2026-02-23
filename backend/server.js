@@ -380,10 +380,15 @@ app.post('/api/loans', async (req, res) => {
   try {
     const { employee_id, principal, start_date, notes } = req.body;
     
-    // Auto-generate loan_id
-    const countResult = await pool.query('SELECT COUNT(*) FROM loans');
-    const count = parseInt(countResult.rows[0].count) + 1;
-    const loan_id = `LOAN${String(count).padStart(3, '0')}`;
+// Auto-generate loan_id
+    const maxResult = await pool.query(`SELECT loan_id FROM loans ORDER BY loan_id DESC LIMIT 1`);
+    let nextNum = 1;
+    if (maxResult.rows.length > 0) {
+      const lastId = maxResult.rows[0].loan_id;
+      const num = parseInt(lastId.replace('LOAN', '')) || 0;
+      nextNum = num + 1;
+    }
+    const loan_id = `LOAN${String(nextNum).padStart(3, '0')}`;
     
     const result = await pool.query(
       `INSERT INTO loans (loan_id, employee_id, principal, remaining, start_date, notes)
