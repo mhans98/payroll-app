@@ -31,7 +31,7 @@ async function initDatabase() {
     const schemaPath = path.join(__dirname, 'db', 'schema.sql');
     const schema = fs.readFileSync(schemaPath, 'utf8');
     await pool.query(schema);
-     ttry {
+     try {
       await pool.query(`ALTER TABLE employees ADD COLUMN IF NOT EXISTS kerajinan_default INTEGER DEFAULT 0`);
     } catch (e) { /* column might already exist */ }
     
