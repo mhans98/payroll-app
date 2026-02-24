@@ -31,9 +31,14 @@ async function initDatabase() {
     const schemaPath = path.join(__dirname, 'db', 'schema.sql');
     const schema = fs.readFileSync(schemaPath, 'utf8');
     await pool.query(schema);
-     try {
+     ttry {
       await pool.query(`ALTER TABLE employees ADD COLUMN IF NOT EXISTS kerajinan_default INTEGER DEFAULT 0`);
     } catch (e) { /* column might already exist */ }
+    
+    // Fix column type to support 0.5 increments
+    try {
+      await pool.query(`ALTER TABLE payroll_entries ALTER COLUMN hari_hadir TYPE DECIMAL(4,1)`);
+    } catch (e) { /* column might already be correct type */ }
   } catch (error) {
     console.error('Database initialization error:', error.message);
     // Tables might already exist, continue anyway
