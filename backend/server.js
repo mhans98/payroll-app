@@ -124,8 +124,16 @@ app.get('/api/employees/:id', async (req, res) => {
 
 app.post('/api/employees', async (req, res) => {
   try {
-    const { employee_id, name, gaji_per_hari, lembur_per_jam, transport_per_hari, makan_per_hari } = req.body;
-    
+    const { name, gaji_per_hari, lembur_per_jam, transport_per_hari, makan_per_hari } = req.body;
+
+    const maxResult = await pool.query(`
+      SELECT MAX(CAST(SUBSTRING(employee_id FROM 4) AS INTEGER)) AS max_num
+      FROM employees
+      WHERE employee_id ~ '^EMP[0-9]+$'
+    `);
+    const nextNum = (maxResult.rows[0].max_num || 0) + 1;
+    const employee_id = `EMP${String(nextNum).padStart(3, '0')}`;
+
  const result = await pool.query(`
       INSERT INTO employees (employee_id, name, gaji_per_hari, lembur_per_jam, transport_per_hari, makan_per_hari, kerajinan_default)
       VALUES ($1, $2, $3, $4, $5, $6, $7)

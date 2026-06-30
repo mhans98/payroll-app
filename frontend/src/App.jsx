@@ -989,7 +989,7 @@ async function viewLoanHistory(loan) {
   // =====================================================
   const EmployeeModal = () => {
         const [form, setForm] = useState(editingEmployee || {
-      employee_id: `EMP${String(employees.reduce((max, e) => { const n = parseInt(e.employee_id?.replace('EMP', '') || '0', 10); return n > max ? n : max; }, 0) + 1).padStart(3, '0')}`,
+      employee_id: '',
       name: '',
       gaji_per_hari: 70000,
       lembur_per_jam: 15000,
@@ -1010,6 +1010,7 @@ async function viewLoanHistory(loan) {
                 <input
                   type="text"
                   value={form.employee_id}
+                  placeholder="Auto"
                   disabled
                   style={{ ...styles.input, background: '#f3f4f6', color: '#6b7280' }}
                 />
